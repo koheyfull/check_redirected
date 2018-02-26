@@ -1,0 +1,16 @@
+{
+  "name": "check_redirected",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "k.furukawa",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "nightmare": "^2.10.0",
+    "vo": "^4.0.2"
+  }
+}
