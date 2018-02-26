@@ -1,40 +1,31 @@
 const Nightmare = require('nightmare')
-const vo = require('vo')
 const baseUrl = 'https://dev.raksul.com:8482'
+var dataset = require('./targets.json')
+var limit = 3;
 
-var dataset = [
-  {
-    requested: '/speed/express-shipping/flyer/',
-    expected: '/flyer/a4/'
-  },
-  {
-    requested: '/speed/shop-pickup/document/vertical-right-top-bind_30page_4c0c_aoyama/',
-    expected: '/document/a4/'
-  },
-]
- 
-dataset.forEach(function (pair) {
-  vo(run(buildUrl(pair['requested']), buildUrl(pair['expected'])))(function(err, result) {
-    if (err) throw err;
-  });
-});
-console.log("complete!");
+dataset.some(function (pair, index) {
+  var nightmare = Nightmare({ show: false });
 
-function *run(requestUrl, expectedUrl) {
-  var nightmare = Nightmare();
-  var redirected = yield nightmare
-    .goto(requestUrl)
-    .url();
+  nightmare
+    .goto(buildUrl(pair['requested']))
+    .url()
+    .end()
+    .then(res => {
+      var expected = buildUrl(pair['expected']);
+      console.log('====================');
+      if (res != expected) {
+        console.log('Unexpected redirect.');
+        console.log('Redirected to: ' + res);
+        console.log('Expected URL is: ' + expected);
+      } else {
+        console.log("OK");
+      }
+    });
 
-  if (expectedUrl != redirected) {
-    console.log('====================');
-    console.log('Unexpected redirect.');
-    console.log('Redirected to: ' + redirected);
-    console.log('Expected URL is: ' + expectedUrl);
+  if (index + 1 == limit) {
+    return true;
   }
-
-  yield nightmare.end();
-}
+});
 
 function buildUrl(uri) {
   return baseUrl + uri;
