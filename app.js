@@ -1,9 +1,11 @@
 const Nightmare = require('nightmare')
+var async = require('async')
 const baseUrl = 'https://dev.raksul.com:8482'
 var dataset = require('./targets.json')
-var limit = 3;
+var limit = 5;
 
-dataset.some(function (pair, index) {
+async.eachLimit(dataset, limit, function(pair, callback) {
+
   var nightmare = Nightmare({ show: false });
 
   nightmare
@@ -12,19 +14,15 @@ dataset.some(function (pair, index) {
     .end()
     .then(res => {
       var expected = buildUrl(pair['expected']);
-      console.log('====================');
       if (res != expected) {
-        console.log('Unexpected redirect.');
-        console.log('Redirected to: ' + res);
-        console.log('Expected URL is: ' + expected);
+        console.log(
+          pair['requested'] + ": NG (" + "Redirected to " + res + ", but expected is " + expected + ")"
+        );
       } else {
-        console.log("OK");
+        console.log(pair['requested'] + ": OK");
       }
+      callback();
     });
-
-  if (index + 1 == limit) {
-    return true;
-  }
 });
 
 function buildUrl(uri) {
